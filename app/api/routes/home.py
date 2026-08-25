@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException
 from app.schemas.research import ResearchRequest
 
 #Create a router object
@@ -25,6 +25,19 @@ def home():
 
 @router.get("/users/{user_id}")
 def get_user(user_id: int):
+    
+    if user_id <=0:
+        raise HTTPException(
+            status_code=400,
+            detail="User ID must be greater than 0."
+        )
+    if user_id > 10:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found."
+        )
+    
+    
     return {
         "user_id":user_id
     }
@@ -48,8 +61,17 @@ def search(query: str):
 
 @router.post("/research")
 def create_research(request: ResearchRequest):
+    
+    if request.topic.strip() == "":
+        raise HTTPException(
+            status_code=400,
+            detail="Research topic cannot be empty."
+        )
+    
+    
     return {
         "topic": request.topic,
         "max_sources": request.max_sources,
         "status": "Research request received."
     }
+    
